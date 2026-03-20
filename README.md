@@ -37,7 +37,7 @@ See `DESIGN.md` for the deeper architectural rationale.
 
 ## Step-by-Step Setup
 
-### Step 2 — Configure Environment Variables
+### Step 1 — Configure Environment Variables
 
 ```bash
 cd backend
@@ -63,7 +63,7 @@ AZURE_OPENAI_API_VERSION=2024-02-01
 
 ---
 
-### Step 3 — Install Backend Dependencies
+### Step 2 — Install Backend Dependencies
 
 ```bash
 cd backend
@@ -74,7 +74,7 @@ pip install -r requirements.txt
 
 ---
 
-### Step 4 — Ingest the PDF Documents
+### Step 3 — Ingest the PDF Documents
 
 ```bash
 # Still in backend/ with venv activated
@@ -108,7 +108,7 @@ Nothing new to ingest.
 
 ---
 
-### Step 5 — Start the Backend API
+### Step 4 — Start the Backend API
 
 ```bash
 # In backend/ with venv activated
@@ -120,7 +120,7 @@ Swagger docs: `http://localhost:8000/docs`
 
 ---
 
-### Step 6 — Install & Start the Frontend
+### Step 5 — Install & Start the Frontend
 
 ```bash
 cd frontend
