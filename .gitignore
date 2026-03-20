@@ -7,6 +7,7 @@ venv/
 .env
 backend/.env
 backend/.env.*
+!backend/.env.example
 *.egg-info/
 
 # ChromaDB data (local, don't commit)
@@ -19,8 +20,10 @@ backend/data/chroma_db/
 frontend/node_modules/
 frontend/dist/
 
-# PDFs (large files — add your own)
-pdfs/*.pdf
+# PDFs (FEMA documents)
+# Commented out to allow adding PDFs to the repo.
+# If GitHub rejects large files, use Git LFS instead.
+# pdfs/*.pdf
 
 # PDF export tooling (downloaded DejaVu fonts)
 scripts/.fonts/

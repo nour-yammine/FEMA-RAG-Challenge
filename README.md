@@ -14,46 +14,14 @@ DejaVu fonts are downloaded on first run into `scripts/.fonts/` (ignored by git)
 
 ---
 
-## Architecture Overview
+## Quick Setup (recommended for running locally)
 
-```
-fema-rag/
-├── backend/          # FastAPI + ChromaDB + Azure OpenAI
-│   ├── ingestion/    # PDF parsing + document-specific chunking
-│   ├── retrieval/    # ChromaDB vector retrieval
-│   ├── generation/   # LLM answer generation with Azure OpenAI
-│   └── main.py       # FastAPI app (REST API)
-├── frontend/         # React + Vite chat UI
-│   └── src/
-│       └── components/
-└── pdfs/             # Place your 5 FEMA PDFs here
-```
+This repo is intended to run with a local configuration:
+- Secrets: `backend/.env` (NOT committed)
+- Template for secrets: `backend/.env.example` (committed, safe placeholders)
+- Data: `pdfs/*.pdf` and the local Chroma DB in `backend/data/chroma_db/` (not committed)
 
-### Chunking Strategy Per Document
-
-| Document | Chunker | Chunk Size | Strategy |
-|---|---|---|---|
-| PAPPG (329 pages) | `HierarchicalChunker` | 1200 chars / 200 overlap | Header-aware recursive split; section title prepended to each chunk |
-| CEF SOP (7 pages) | `ProceduralChunker` | 800 chars / 150 overlap | Step-preserving; keeps numbered steps intact |
-| SFM SOP (6 pages) | `ProceduralChunker` | 800 chars / 150 overlap | Same as CEF |
-| Damage Assessment (128 pages) | `SectionChunker` | 1000 chars / 200 overlap | Section-boundary-aware splitting |
-| PA Applicant Handbook (134 pages) | `MixedChunker` | 1000 chars / 150 overlap | Paragraph-aware with section context |
-
-### Deduplication
-
-A `data/ingestion_manifest.json` file tracks each PDF by its MD5 hash. If you run ingestion again on an already-ingested file (unchanged), it is silently skipped.  
-To force re-ingestion of a specific file, delete its entry from the manifest (or pass `--force` to the ingest script).
-
-### Document-aware improvements (re-ingest to apply)
-
-After upgrading chunking/retrieval logic, run **`python -m ingestion.ingest --pdf-dir ../pdfs --force`** once so Chroma picks up:
-
-- **Hierarchy:** `section_path` breadcrumbs (e.g. `Chapter 2 > 2.1 Overview`) stored in metadata and chunk text prefixes.
-- **Tables:** `pdfplumber` table extraction appended as **markdown** blocks per page when grid lines are detected.
-- **Acronyms:** Query-time expansion (see `FEMA_ACRONYM_EXPANSIONS` in `config.py`) improves embedding match for PA, CEF, PAPPG, etc.
-- **Cross-references:** Up to `CROSS_REF_MAX_EXTRA_QUERIES` (default 2) extra vector searches from phrases like “see Section …” / form refs mined from the question and top chunks.
-
-Set `CROSS_REF_MAX_EXTRA_QUERIES=0` in `.env` to disable follow-up retrieval.
+See `DESIGN.md` for the deeper architectural rationale.
 
 ---
 
@@ -62,7 +30,7 @@ Set `CROSS_REF_MAX_EXTRA_QUERIES=0` in `.env` to disable follow-up retrieval.
 - Python 3.10+
 - Node.js 18+
 - Your 5 FEMA PDF files (place them in `pdfs/`)
-- Azure OpenAI credentials (fill in `.env`)
+- Azure OpenAI credentials (copy `backend/.env.example` to `backend/.env`)
 
 ---
 
@@ -83,6 +51,16 @@ pdfs/
 
 > The exact filenames don't matter — the system detects document type by keywords in the filename.
 
+### If you plan to push the PDFs
+This repo can include PDFs in Git. If GitHub rejects uploads (file too large), install Git LFS and re-add the PDFs:
+```bash
+git lfs install
+git lfs track "pdfs/*.pdf"
+git add .gitattributes
+git add pdfs/*.pdf
+git commit -m "Add FEMA PDFs (via LFS)"
+```
+
 ---
 
 ### Step 2 — Configure Environment Variables
@@ -90,10 +68,9 @@ pdfs/
 ```bash
 cd backend
 # Windows PowerShell:
-# Copy-Item .env.example .env
-#
+Copy-Item .env.example .env
 # macOS/Linux:
-cp .env.example .env
+# cp .env.example .env
 ```
 
 Open `backend/.env` and fill in your Azure OpenAI credentials:
@@ -105,14 +82,9 @@ AZURE_OPENAI_DEPLOYMENT=your_deployment_name
 AZURE_OPENAI_API_VERSION=2024-02-01
 ```
 
-#### Security note (for GitHub push / zip)
-Do not commit `backend/.env`. It contains your API key(s).
-
-If you use Git, verify before the first commit:
-```bash
-git status
-```
-Confirm `backend/.env` is not shown as something to commit.
+#### Security note
+`backend/.env.example` is committed for reference.
+`backend/.env` contains secrets and is ignored by git (do not commit it).
 
 ---
 
@@ -183,60 +155,17 @@ Frontend available at `http://localhost:5173`
 
 ---
 
-## Run All 15 Test Questions
-After you've ingested PDFs and started the backend, you can automatically run every test question and export a combined report (JSON + Markdown).
-
+## Optional: run test questions
+After ingestion and backend start:
 ```bash
 # From repo root
 python backend/run_test_questions.py --base-url http://localhost:8000 --top-k 5
 ```
+Outputs go to `outputs/` (created automatically).
 
-The script writes outputs to `outputs/` (created automatically).
-
----
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/chat` | Send a message, get answer + retrieval metadata |
-| `GET` | `/ingestion-status` | See what documents are ingested |
-| `GET` | `/health` | Health check |
-| `DELETE` | `/conversation/{id}` | Clear a conversation's history |
-
-### Chat Request/Response
-
-```json
-POST /chat
-{
-  "message": "What is the Cost Estimating Format?",
-  "conversation_id": "abc123",   // optional, omit to start new conversation
-  "top_k": 5                     // optional, default 5
-}
-```
-
-```json
-{
-  "answer": "The Cost Estimating Format (CEF) is a FEMA tool used for...",
-  "conversation_id": "abc123",
-  "sources": [
-    {
-      "chunk_id": "cef-sop-chunk-0042",
-      "text": "The CEF is used for large projects exceeding...",
-      "score": 0.912,
-      "source_document": "Cost_Estimating_Format_SOP.pdf",
-      "page_number": 2,
-      "section": "2. Purpose",
-      "chunk_strategy": "ProceduralChunker",
-      "chunk_index": 42
-    }
-  ],
-  "num_chunks_retrieved": 5,
-  "model_used": "gpt-35-turbo"
-}
-```
-
----
+## Quick sanity checks
+- Backend health: `GET http://localhost:8000/health`
+- Use the frontend chat UI at `http://localhost:5173`
 
 
 
