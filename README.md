@@ -1,19 +1,3 @@
-# FEMA RAG Chat Application
-
-A Retrieval-Augmented Generation (RAG) pipeline and React chat interface for querying FEMA Public Assistance documents.
-
-For a **submission-style design write-up** (chunking rationale, env vars, retrieval scoring, API/UI contract), see **[DESIGN.md](./DESIGN.md)**.
-
-To generate **`DESIGN.pdf`** from that file (requires `fpdf2` and `markdown` — e.g. `pip install fpdf2 markdown` in the backend venv):
-
-```bash
-python scripts/export_design_pdf.py
-```
-
-DejaVu fonts are downloaded on first run into `scripts/.fonts/` (ignored by git).
-
----
-
 ## Quick Setup (recommended for running locally)
 
 This repo is intended to run with a local configuration:
