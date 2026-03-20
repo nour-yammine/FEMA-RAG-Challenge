@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+# Env files (keep secrets out of Git)
+.env
+backend/.env
+backend/.env.*
+*.egg-info/
+
+# ChromaDB data (local, don't commit)
+backend/data/chroma_db/
+
+# Manifest (optional to commit — contains local paths)
+# backend/data/ingestion_manifest.json
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# PDFs (large files — add your own)
+pdfs/*.pdf
+
+# PDF export tooling (downloaded DejaVu fonts)
+scripts/.fonts/
+
+# OS
+.DS_Store
+Thumbs.db

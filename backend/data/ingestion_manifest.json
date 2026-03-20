@@ -1,0 +1,44 @@
+{
+  "ingested_files": {
+    "cef_sop.pdf": {
+      "hash": "3c497fd8cd629dda62e9bb29dcab2889",
+      "path": "C:\\Users\\Dynabook\\Downloads\\fema-rag\\pdfs\\cef_sop.pdf",
+      "document_label": "CEF_SOP",
+      "chunker": "ProceduralChunker",
+      "num_chunks": 50,
+      "ingested_at": "2026-03-19T23:02:26.525898+00:00"
+    },
+    "fema323_app_handbk.pdf": {
+      "hash": "8f3e80bb6fcdc58796ebba7e9d1babd3",
+      "path": "C:\\Users\\Dynabook\\Downloads\\fema-rag\\pdfs\\fema323_app_handbk.pdf",
+      "document_label": "ApplicantHandbook",
+      "chunker": "MixedChunker",
+      "num_chunks": 269,
+      "ingested_at": "2026-03-19T23:02:48.046187+00:00"
+    },
+    "fema_9570.24_startegic-funds-mgmt_SOP_12-21-2012.pdf": {
+      "hash": "1b2eeffaf92c79f219bfc2baaea0fbd1",
+      "path": "C:\\Users\\Dynabook\\Downloads\\fema-rag\\pdfs\\fema_9570.24_startegic-funds-mgmt_SOP_12-21-2012.pdf",
+      "document_label": "SFM_SOP",
+      "chunker": "ProceduralChunker",
+      "num_chunks": 30,
+      "ingested_at": "2026-03-19T23:02:49.953121+00:00"
+    },
+    "fema_pa_pappg-5.0-amended.pdf": {
+      "hash": "802c5c773397dc6dbbd1745c98b664b4",
+      "path": "C:\\Users\\Dynabook\\Downloads\\fema-rag\\pdfs\\fema_pa_pappg-5.0-amended.pdf",
+      "document_label": "PAPPG",
+      "chunker": "HierarchicalChunker",
+      "num_chunks": 1639,
+      "ingested_at": "2026-03-19T23:04:57.402396+00:00"
+    },
+    "FEMADAOM.pdf": {
+      "hash": "01ae9f2ff8a9936d4af1db635114a99f",
+      "path": "C:\\Users\\Dynabook\\Downloads\\fema-rag\\pdfs\\FEMADAOM.pdf",
+      "document_label": "DamageAssessment",
+      "chunker": "SectionChunker",
+      "num_chunks": 728,
+      "ingested_at": "2026-03-19T23:05:36.591789+00:00"
+    }
+  }
+}
