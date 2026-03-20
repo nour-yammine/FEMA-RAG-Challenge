@@ -17,6 +17,7 @@ DejaVu fonts are downloaded on first run into `scripts/.fonts/` (ignored by git)
 ## Quick Setup (recommended for running locally)
 
 This repo is intended to run with a local configuration:
+
 - Secrets: `backend/.env` (NOT committed)
 - Template for secrets: `backend/.env.example` (committed, safe placeholders)
 - Data: `pdfs/*.pdf` and the local Chroma DB in `backend/data/chroma_db/` (not committed)
@@ -29,39 +30,12 @@ See `DESIGN.md` for the deeper architectural rationale.
 
 - Python 3.10+
 - Node.js 18+
-- Your 5 FEMA PDF files (place them in `pdfs/`)
+- Your 5 FEMA PDF files (expected in `pdfs/`)
 - Azure OpenAI credentials (copy `backend/.env.example` to `backend/.env`)
 
 ---
 
 ## Step-by-Step Setup
-
-### Step 1 — Place the PDF Files
-
-Copy your 5 FEMA PDFs into the `pdfs/` folder:
-
-```
-pdfs/
-├── Public_Assistance_Program_and_Policy_Guide.pdf
-├── Cost_Estimating_Format_SOP.pdf
-├── Strategic_Funds_Management_SOP.pdf
-├── Damage_Assessment_Operations_Manual.pdf
-└── PA_Applicant_Handbook.pdf
-```
-
-> The exact filenames don't matter — the system detects document type by keywords in the filename.
-
-### If you plan to push the PDFs
-This repo can include PDFs in Git. If GitHub rejects uploads (file too large), install Git LFS and re-add the PDFs:
-```bash
-git lfs install
-git lfs track "pdfs/*.pdf"
-git add .gitattributes
-git add pdfs/*.pdf
-git commit -m "Add FEMA PDFs (via LFS)"
-```
-
----
 
 ### Step 2 — Configure Environment Variables
 
@@ -83,6 +57,7 @@ AZURE_OPENAI_API_VERSION=2024-02-01
 ```
 
 #### Security note
+
 `backend/.env.example` is committed for reference.
 `backend/.env` contains secrets and is ignored by git (do not commit it).
 
@@ -110,6 +85,7 @@ python -m ingestion.ingest --pdf-dir ../pdfs --force Cost_Estimating_Format_SOP.
 ```
 
 Expected output:
+
 ```
 [manifest] Cost_Estimating_Format_SOP.pdf → NEW — ingesting...
 [chunker]  ProceduralChunker applied → 47 chunks
@@ -123,6 +99,7 @@ Ingestion complete. Total chunks in vector store: 1,203
 ```
 
 On the second run (no changes):
+
 ```
 [manifest] Cost_Estimating_Format_SOP.pdf → ALREADY INGESTED (hash match) — skipping
 ...
@@ -156,16 +133,17 @@ Frontend available at `http://localhost:5173`
 ---
 
 ## Optional: run test questions
+
 After ingestion and backend start:
+
 ```bash
 # From repo root
 python backend/run_test_questions.py --base-url http://localhost:8000 --top-k 5
 ```
+
 Outputs go to `outputs/` (created automatically).
 
 ## Quick sanity checks
+
 - Backend health: `GET http://localhost:8000/health`
 - Use the frontend chat UI at `http://localhost:5173`
-
-
-
